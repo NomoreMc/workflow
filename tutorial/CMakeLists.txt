@@ -42,6 +42,7 @@ set(TUTORIAL_LIST
 	tutorial-09-http_file_server
 	tutorial-11-graph_task
 	tutorial-15-name_service
+	tutorial-17-dns_cli
 	tutorial-20-reducer
 )
 
@@ -93,10 +94,28 @@ endif ()
 set(DIR10 tutorial-10-user_defined_protocol)
 add_executable(server ${DIR10}/server.cc ${DIR10}/message.cc)
 add_executable(client ${DIR10}/client.cc ${DIR10}/message.cc)
+add_executable(server-uds ${DIR10}/server-uds.cc ${DIR10}/message.cc)
+add_executable(client-uds ${DIR10}/client-uds.cc ${DIR10}/message.cc)
 target_link_libraries(server ${WORKFLOW_LIB})
 target_link_libraries(client ${WORKFLOW_LIB})
+target_link_libraries(server-uds ${WORKFLOW_LIB})
+target_link_libraries(client-uds ${WORKFLOW_LIB})
 
 set_target_properties(server PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/${DIR10})
 set_target_properties(client PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/${DIR10})
+set_target_properties(server-uds PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/${DIR10})
+set_target_properties(client-uds PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/${DIR10})
+
+set(DIR16 tutorial-16-graceful_restart)
+add_executable(bootstrap ${DIR16}/bootstrap.c)
+add_executable(bootstrap_server ${DIR16}/server.cc)
+target_link_libraries(bootstrap_server ${WORKFLOW_LIB})
+
+set_target_properties(bootstrap PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/${DIR16})
+set_target_properties(bootstrap_server PROPERTIES OUTPUT_NAME "server"
+	RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/${DIR16})

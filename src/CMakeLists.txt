@@ -74,7 +74,7 @@ else()
 endif()
 
 set_target_properties(${STATIC_LIB_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
-set_target_properties(${SHARED_LIB_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+set_target_properties(${SHARED_LIB_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME} VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR})
 
 if (KAFKA STREQUAL "y")
 	add_dependencies(client_kafka LINK_HEADERS)
@@ -102,9 +102,9 @@ if (KAFKA STREQUAL "y")
 	if (APPLE)
 		target_link_libraries(${KAFKA_SHARED_LIB_NAME}
 							  workflow z lz4 zstd ${SNAPPY_LIB}
-							  OpenSSL::SSL OpenSSL::Crypto pthread)
+							  OpenSSL::Crypto pthread)
 	endif ()
-	set_target_properties(${KAFKA_SHARED_LIB_NAME} PROPERTIES OUTPUT_NAME "wfkafka")
+	set_target_properties(${KAFKA_SHARED_LIB_NAME} PROPERTIES OUTPUT_NAME "wfkafka" VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR})
 endif ()
 
 install(

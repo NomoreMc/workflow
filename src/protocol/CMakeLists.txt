@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 project(protocol)
 
 set(SRC
+	PackageWrapper.cc
 	dns_parser.c
 	DnsMessage.cc
 	DnsUtil.cc
@@ -18,6 +19,7 @@ if (NOT MYSQL STREQUAL "n")
 		mysql_byteorder.c
 		MySQLMessage.cc
 		MySQLResult.cc
+		MySQLUtil.cc
 	)
 endif ()
 
@@ -40,6 +42,4 @@ if (KAFKA STREQUAL "y")
 	)
 	add_library("protocol_kafka" OBJECT ${SRC})
 	set_property(SOURCE KafkaMessage.cc APPEND PROPERTY COMPILE_OPTIONS "-fno-rtti")
-	set_property(SOURCE KafkaDataTypes.cc APPEND PROPERTY COMPILE_OPTIONS "-fno-rtti")
-	set_property(SOURCE KafkaResult.cc APPEND PROPERTY COMPILE_OPTIONS "-fno-rtti")
 endif ()

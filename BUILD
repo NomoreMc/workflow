@@ -12,9 +12,8 @@ cc_library(
 	includes = ['src/include'],
 	visibility = ["//visibility:public"],
 	linkopts = [
-	    '-lpthread',
-	    '-lssl',
-	    '-lcrypto',
+		'-lpthread',
+		'-lcrypto',
 	],
 )
 cc_library(
@@ -26,6 +25,7 @@ cc_library(
 		'src/kernel/rbtree.c',
 		'src/kernel/thrdpool.c',
 		'src/util/crc32c.c',
+		'src/util/json_parser.c',
 	],
 	hdrs = glob(['src/*/*.h']) + glob(['src/*/*.inl']),
 	includes = [
@@ -44,6 +44,7 @@ cc_library(
 		'src/factory/FileTaskImpl.cc',
 		'src/factory/WFGraphTask.cc',
 		'src/factory/WFResourcePool.cc',
+		'src/factory/WFMessageQueue.cc',
 		'src/factory/WFTaskFactory.cc',
 		'src/factory/Workflow.cc',
 		'src/manager/DnsCache.cc',
@@ -53,7 +54,7 @@ cc_library(
 		'src/nameservice/WFNameService.cc',
 		'src/protocol/DnsMessage.cc',
 		'src/protocol/DnsUtil.cc',
-		'src/protocol/SSLWrapper.cc',
+		'src/protocol/PackageWrapper.cc',
 		'src/protocol/dns_parser.c',
 		'src/server/WFServer.cc',
 		'src/kernel/CommRequest.cc',
@@ -136,6 +137,7 @@ cc_library(
 		'src/protocol/MySQLMessage.inl',
 		'src/protocol/MySQLResult.h',
 		'src/protocol/MySQLResult.inl',
+		'src/protocol/MySQLUtil.h',
 		'src/protocol/mysql_byteorder.h',
 		'src/protocol/mysql_parser.h',
 		'src/protocol/mysql_stream.h',
@@ -152,6 +154,7 @@ cc_library(
 		'src/factory/MySQLTaskImpl.cc',
 		'src/protocol/MySQLMessage.cc',
 		'src/protocol/MySQLResult.cc',
+		'src/protocol/MySQLUtil.cc',
 		'src/protocol/mysql_byteorder.c',
 		'src/protocol/mysql_parser.c',
 		'src/protocol/mysql_stream.c',
@@ -161,6 +164,7 @@ cc_library(
 	],
 	visibility = ["//visibility:public"],
 )
+
 cc_library(
 	name = 'upstream',
 	hdrs = [
@@ -182,6 +186,30 @@ cc_library(
 	],
 	visibility = ["//visibility:public"],
 )
+
+cc_library(
+	name = 'kafka_message',
+	hdrs = [
+		'src/factory/KafkaTaskImpl.inl',
+		'src/protocol/KafkaDataTypes.h',
+		'src/protocol/KafkaMessage.h',
+		'src/protocol/KafkaResult.h',
+		'src/protocol/kafka_parser.h',
+	],
+	includes = [
+		'src/factory',
+		'src/protocol',
+	],
+	srcs = [
+		'src/factory/KafkaTaskImpl.cc',
+		'src/protocol/KafkaMessage.cc',
+	],
+	copts = ['-fno-rtti'],
+	deps = [
+		':common',
+	],
+)
+
 cc_library(
 	name = 'kafka',
 	hdrs = [
@@ -199,23 +227,42 @@ cc_library(
 	],
 	srcs = [
 		'src/client/WFKafkaClient.cc',
-		'src/factory/KafkaTaskImpl.cc',
 		'src/protocol/KafkaDataTypes.cc',
-		'src/protocol/KafkaMessage.cc',
 		'src/protocol/KafkaResult.cc',
 		'src/protocol/kafka_parser.c',
 	],
-	copts = ['-fno-rtti'],
+	deps = [
+		':common',
+		':kafka_message',
+	],
+	visibility = ["//visibility:public"],
+	linkopts = [
+		'-lsnappy',
+		'-llz4',
+		'-lz',
+		'-lzstd',
+	],
+)
+
+cc_library(
+	name = 'consul',
+	hdrs = [
+		'src/client/WFConsulClient.h',
+		'src/protocol/ConsulDataTypes.h',
+	],
+	includes = [ 
+		'src/client',
+		'src/factory',
+		'src/protocol',
+		'src/util',
+	],
+	srcs = [ 
+		'src/client/WFConsulClient.cc',
+	],
 	deps = [
 		':common',
 	],
 	visibility = ["//visibility:public"],
-	linkopts = [
-	    '-lsnappy',
-	    '-llz4',
-	    '-lz',
-	    '-lzstd',
-	],
 )
 
 cc_binary(
@@ -316,5 +363,4 @@ cc_binary(
 	 name = 'kafka_cli',
 	 srcs = ['tutorial/tutorial-13-kafka_cli.cc'],
 	 deps = [':kafka', ':workflow_hdrs'],
-	 copts = ['-fno-rtti'],
 )
